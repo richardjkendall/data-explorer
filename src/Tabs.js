@@ -2,7 +2,29 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const ButtonTray = styled.div`
-  margin: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  border-bottom: grey 2px solid;
+
+  button {
+    border-left: lightgrey 2px solid;
+    border-top: lightgrey 2px solid;
+    border-right: grey 2px solid;
+    border-bottom: none;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    border-left-color: grey;
+    border-top-color: grey;
+    border-right-color: lightgrey;
+    color: lightblue;
+  }
+
+  button:not(:disabled):hover {
+    font-weight: bold;
+  }
 
   button:not(:first-child) {
     margin-left: 5px;

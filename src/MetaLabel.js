@@ -7,7 +7,7 @@ const Container = styled.div`
   top: 20px;
   width: 190px;
   height: 20px;
-  border-radius: 10px;
+  border-radius: 5px;
   background-color: limegreen;
   color: #ffffff;
   font-size: 10pt;

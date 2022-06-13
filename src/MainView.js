@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from "d3"; 
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,6 +13,7 @@ import Tabs from './Tabs';
 import TabContent from './TabContent';
 import InjectContainerSize from './InjectContainerSize';
 import MetaLabel from './MetaLabel';
+import ErrorDisplay from './ErrorDisplay';
 
 // ControlPanel is the area at the top where the filters are placed
 // may be extended in the future hence being called ControlPanel
@@ -66,6 +67,9 @@ const Visual = styled.div`
 `
 
 const MainView = () => {
+  /* refs */
+  const errorRef = useRef();        // reference to the error display module
+
   /* places to store state */
   const [sankeyShowBlackhole, setSankeyShowBlackhole] = useState(false);  // should we show the sankey blackhole nodes/links
   const [allData, setAllData] = useState([]);                             // this is all the raw data as loaded
@@ -239,6 +243,7 @@ const MainView = () => {
 
   return (
     <div>
+      <ErrorDisplay ref={errorRef} />
       {allData.length === 0 &&
       <div>
         <p>To get started open a JSON or CSV file from your computer.</p>
