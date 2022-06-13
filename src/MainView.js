@@ -12,6 +12,7 @@ import Sankey from './Sankey';
 import Tabs from './Tabs';
 import TabContent from './TabContent';
 import InjectContainerSize from './InjectContainerSize';
+import MetaLabel from './MetaLabel';
 
 // ControlPanel is the area at the top where the filters are placed
 // may be extended in the future hence being called ControlPanel
@@ -75,6 +76,7 @@ const MainView = () => {
   const [filters, setFilters] = useState([]);                             // filters that have been created
   const [dispData, setDispData] = useState([]);                           // this is the data which matches the filters
   const [filterStats, setFilterStats] = useState([]);                     // these are the stats from the filtering process
+  const [fileName, setFileName] = useState("");                           // name of the loaded file
   const [sankeyData, setSankeyData] = useState({                          // data used to render the Sankey diagram
     nodes: [],
     links: []
@@ -217,10 +219,12 @@ const MainView = () => {
         switch(fileType) {
           case "application/json":
             // this is a JSON file
+            setFileName(fileName);
             loadJson(content);
             break;
           case "text/csv":
             // this is a CSV file
+            setFileName(fileName);
             loadCsv(content);
             break;
           default:
@@ -242,6 +246,7 @@ const MainView = () => {
       </div>}
       {allData.length > 0 &&
       <div>
+        {fileName !== "" && <MetaLabel title={fileName} />}
         <ControlPanel>
           <ControlTitle>Filters</ControlTitle>
           <Filters>
@@ -322,7 +327,7 @@ const MainView = () => {
                     ...filterStats.map(s => {
                       return {
                         // TODO fix bug below for deleted filters, need to guard against failed access to this field
-                        group: filters.filter(f => f.id === s.forId)[0].field,
+                        group: filters.filter(f => f.id === s.forId)[0]?.field,
                         minus: s.eliminated
                       }
                     })

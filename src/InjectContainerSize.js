@@ -15,11 +15,15 @@ const InjectContainerSize = ({children}) => {
 
   useEffect(() => {
     const displayObserver = new ResizeObserver(entries => {
-      const containerRect = ref.current.getBoundingClientRect();
-      setRect({
-        width: containerRect.width,
-        height: containerRect.height
-      });
+      try {
+        const containerRect = ref.current.getBoundingClientRect();
+        setRect({
+          width: containerRect.width,
+          height: containerRect.height
+        });
+      } catch(err) {
+        console.log("got an error in InjectContainerSize");
+      }
     });
     displayObserver.observe(ref.current);
 

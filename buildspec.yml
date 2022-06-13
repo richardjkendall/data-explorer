@@ -1,0 +1,20 @@
+
+version: 0.2
+phases:
+  install:
+    commands:
+      - echo "install step"
+      - npm ci
+  pre_build:
+    commands:
+      - echo "any prebuild actvities"
+  build:
+    commands:
+      - echo ${TARGET_BUCKET}
+      - CI=false npm run build
+      - cd build
+      - aws s3 sync . s3://${TARGET_BUCKET} --delete
+  post_build:
+    commands:
+      - echo "update cloudfront distribution"
+      - aws cloudfront create-invalidation --distribution-id "${DISTRIBUTION_ID}" --paths "/index.html"
