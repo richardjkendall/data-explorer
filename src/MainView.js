@@ -196,8 +196,13 @@ const MainView = () => {
 
   // TODO: need to catch errors on loading
   const loadJson = (content) => {
-    const parsed = JSON.parse(content);
-    setAllData(parsed);
+    try {
+      const parsed = JSON.parse(content);
+      setAllData(parsed);
+    } catch (err) {
+      console.log("hit error in JSON parse", err);
+      errorRef.current.addError(`Could not read file: ${err.message}`);
+    }
   }
 
   // TODO: need to catch errors on loading
@@ -209,6 +214,7 @@ const MainView = () => {
   const openFile = (e) => {
     const file = e.target.files[0];
     if(!file) {
+      errorRef.current.addError("No file selected");
       return;
     }
     const fileType = file.type;
@@ -232,9 +238,11 @@ const MainView = () => {
             loadCsv(content);
             break;
           default:
+            errorRef.current.addError(`File type of ${fileType} is not supported.`);
             return;
         }
       } else {
+        errorRef.current.addError(`Error reading ${fileName}`);
         return;
       }
     }
@@ -243,7 +251,7 @@ const MainView = () => {
 
   return (
     <div>
-      <ErrorDisplay ref={errorRef} />
+      <ErrorDisplay ref={errorRef} displayLength={15} />
       {allData.length === 0 &&
       <div>
         <p>To get started open a JSON or CSV file from your computer.</p>

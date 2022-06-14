@@ -24,20 +24,30 @@ const ErrorBox = styled.div`
 `
 
 const ErrorDisplay = forwardRef((props, ref) => {
-  const [errors, setErrors] = useState([]);
+  const [errors, _setErrors] = useState([]);
+  const errorsRef = useRef(errors);
+  const setErrors = data => {
+    errorsRef.current = data;
+    _setErrors(data);
+  }
   const intervalRef = useRef();
 
   const clearOld = () => {
-    console.log("clearing old");
+    //console.log("clearing old errors", errorsRef.current);
+    const currentTs = Math.floor(Date.now() / 1000);
+    setErrors(
+      errorsRef.current.filter(e => currentTs - e.created < props.displayLength)
+    );
   }
 
   useImperativeHandle(ref, () => ({
     addError(text) {
       setErrors(
-        errors.concat({
+        [{
           id: uuidv4(),
-          errorText: text
-        })
+          errorText: text,
+          created: Math.floor(Date.now() / 1000)
+        }].concat(errors)
       );
     }
   }));
