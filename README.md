@@ -22,6 +22,8 @@ The application inspects the data and creates in-memory structures which allows 
 
 There's an example below of the kind of output you can generate, showing the different visualisations based on filters as they are created.
 
+![Example output](images/example.png)
+
 ## To do
 I plan to extend the tool, including:
 
