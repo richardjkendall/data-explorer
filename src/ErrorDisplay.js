@@ -9,6 +9,8 @@ const ErrorTray = styled.div`
   z-index: 30;
 `
 
+// inspiration for how to do the transition part came from here 
+// https://letsbuildui.dev/articles/how-to-animate-mounting-content-in-react
 const ErrorBox = styled.div`
   position: relative;
   padding: 10px;
@@ -16,6 +18,15 @@ const ErrorBox = styled.div`
   color: white;
 
   margin: 10px;
+
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 1s ease, transform 1s ease;
+
+  &[data-visible="yes"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   p {
     padding: 0px;
@@ -37,6 +48,12 @@ const ErrorDisplay = forwardRef((props, ref) => {
     const currentTs = Math.floor(Date.now() / 1000);
     setErrors(
       errorsRef.current.filter(e => currentTs - e.created < props.displayLength)
+      .map(e => {
+        return({
+          ...e,
+          visible: currentTs - e.created < (props.displayLength - 2)
+        })
+      })
     );
   }
 
@@ -46,7 +63,8 @@ const ErrorDisplay = forwardRef((props, ref) => {
         [{
           id: uuidv4(),
           errorText: text,
-          created: Math.floor(Date.now() / 1000)
+          created: Math.floor(Date.now() / 1000),
+          visible: true
         }].concat(errors)
       );
     }
@@ -67,7 +85,7 @@ const ErrorDisplay = forwardRef((props, ref) => {
 
   }, []);
 
-  const ErrorBoxes = errors.map(error => <ErrorBox key={"error_" + error.id}>{error.errorText}</ErrorBox>)
+  const ErrorBoxes = errors.map(error => <ErrorBox data-visible={error.visible ? "yes": "no"} key={"error_" + error.id}>{error.errorText}</ErrorBox>)
 
   return(
     <div>

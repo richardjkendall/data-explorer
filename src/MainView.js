@@ -14,6 +14,7 @@ import TabContent from './TabContent';
 import InjectContainerSize from './InjectContainerSize';
 import MetaLabel from './MetaLabel';
 import ErrorDisplay from './ErrorDisplay';
+import Loading from './Loading';
 
 // ControlPanel is the area at the top where the filters are placed
 // may be extended in the future hence being called ControlPanel
@@ -71,6 +72,7 @@ const MainView = () => {
   const errorRef = useRef();        // reference to the error display module
 
   /* places to store state */
+  const [loading, setLoading] = useState(false);                           // should the loading box be open
   const [sankeyShowBlackhole, setSankeyShowBlackhole] = useState(false);  // should we show the sankey blackhole nodes/links
   const [allData, setAllData] = useState([]);                             // this is all the raw data as loaded
   const [dataHash, setDataHash] = useState({});                           // this is the raw data organised as a hash with the key being the __sys_id (row ID)
@@ -89,6 +91,7 @@ const MainView = () => {
   // need to process data once loaded
   useEffect(() => {
     if(allData.length > 0) {
+      setLoading(true);
       const stats = GetStats(allData);
       console.log("stats", stats);
       setFieldNames(Object.keys(stats));
@@ -103,6 +106,7 @@ const MainView = () => {
         }, {})
       );
       setDataStats(stats);
+      setLoading(false);
     }
   }, [allData]);
 
@@ -194,7 +198,6 @@ const MainView = () => {
     }));
   }
 
-  // TODO: need to catch errors on loading
   const loadJson = (content) => {
     try {
       const parsed = JSON.parse(content);
@@ -212,9 +215,11 @@ const MainView = () => {
   }
 
   const openFile = (e) => {
+    setLoading(true);
     const file = e.target.files[0];
     if(!file) {
       errorRef.current.addError("No file selected");
+      setLoading(false);
       return;
     }
     const fileType = file.type;
@@ -245,16 +250,21 @@ const MainView = () => {
         errorRef.current.addError(`Error reading ${fileName}`);
         return;
       }
+      setLoading(false);
     }
     reader.readAsDataURL(file);
   }
 
   return (
     <div>
-      <ErrorDisplay ref={errorRef} displayLength={15} />
+      <ErrorDisplay ref={errorRef} displayLength={10} />
+      <Loading
+        showLoading={loading}
+      />
       {allData.length === 0 &&
       <div>
         <p>To get started open a JSON or CSV file from your computer.</p>
+        <p>All the data is processed locally and not uploaded to the server.  If you don't believe me, then you can run this app for yourself by following the instructions here: <a href="https://github.com/richardjkendall/data-explorer">https://github.com/richardjkendall/data-explorer</a></p>
         <input onChange={openFile} type="file" />
       </div>}
       {allData.length > 0 &&
