@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
+import "./waterfall.css";
 
 const Waterfall = ({ margin, width, height, data, endName }) => {
   const subgroups = ["start", "float", "minus", "plus", endName];
@@ -98,20 +99,44 @@ const Waterfall = ({ margin, width, height, data, endName }) => {
     const stacked = d3.stack()
               .keys(subgroups)
               (procData.rows);
-              
-    selection.append("g")
-      .selectAll("g")
+
+    let bars = selection
+      .selectAll(".bar")
       .data(stacked)
-      .enter().append("g")
+      .enter()
+      .append("g")
         .attr("fill", d => colours(d.key))
         .selectAll("rect")
-        .data(d => d)
-        .enter().append("rect")
-          .attr("x", d => xScale(d.data.group))
-          .attr("width", xScale.bandwidth() - 10)
-          //.transition().duration(300)
-            .attr("y", d => yScale(d[1]))
-            .attr("height", d => yScale(d[0]) - yScale(d[1]))
+          .data(d => d)
+          .enter()
+          .append("g")
+            .attr("transform", d => `translate(${xScale(d.data.group)},${yScale(d[1])})`);
+    
+    bars.append("rect")
+      .attr("width", xScale.bandwidth() - 10)
+      .attr("height", d => yScale(d[0]) - yScale(d[1]));
+    
+    bars.append("text")
+      .attr("class", "small-text-waterfall")
+      .attr("y", d => (yScale(d[0]) - yScale(d[1])) / 2)
+      .attr("x", (xScale.bandwidth() - 10) / 2)
+      .filter(d => (yScale(d[0]) - yScale(d[1])) > 0)
+      .style("fill", "white")
+      .attr("text-anchor", "middle")
+      .text(d => {
+        const data = d.data;
+        if(data.start > 0) {
+          return data.start;
+        } else if(data.minus > 0) {
+          return data.minus
+        } else if(data.plus > 0) {
+          return data.plus;
+        } else if(data["Final Set"] > 0) {
+          return data["Final Set"];
+        } else {
+          return "na"
+        }
+      })
   }
 
   useEffect(() => {
