@@ -20,9 +20,10 @@ import Loading from './Loading';
 // may be extended in the future hence being called ControlPanel
 const ControlPanel = styled.div`
   height: 222px;
-  background-color: #efefef;
+  background-color: #f1f1f1;
   padding: 10px;
   margin-bottom: 5px;
+  border: 1px solid #cccccc;
 `
 
 // ControlTitle is the title of the control panel, at the moment it says 'Filters'

@@ -136,7 +136,7 @@ const Waterfall = ({ margin, width, height, data, endName }) => {
         } else {
           return "na"
         }
-      })
+      });
   }
 
   useEffect(() => {

@@ -6,7 +6,8 @@ import { RoundNumberForDisplay } from './Utils';
 const Container = styled.div`
   width: 180px;
   height: 190px;
-  background-color: darkgray;
+  background-color: #e1e1e1;
+  border: 1px solid #cccccc;
   padding: 5px;
   margin-right: 5px;
 
@@ -16,6 +17,7 @@ const Container = styled.div`
     margin: 0px;
     margin-bottom: 3px;
     max-width: 100%;
+    border: 1px solid #cccccc;
   }
   
   button {
@@ -34,8 +36,8 @@ const ListOfOptions = styled.div.attrs(props => ({
     height: props.fullHeight ? "140px" : "100px"
   }
 }))`
-  width: calc(100% - 8px);
-  border: solid 1px black;
+  width: calc(100% - 6px);
+  border: 1px solid #cccccc;
   background-color: white;
   padding: 2px;
   overflow-y: scroll;

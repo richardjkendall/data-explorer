@@ -1,33 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-const ButtonTray = styled.div`
-  margin-top: 5px;
-  margin-bottom: 5px;
+const Box = styled.div`
+  border: 1px solid #cccccc;
+`
 
-  border-bottom: grey 2px solid;
+const ButtonTray = styled.div`
+  color: #000000;
+  background-color: #f1f1f1;
+  border-bottom: 1px solid #cccccc;
+
+  &::before {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
 
   button {
-    border-left: lightgrey 2px solid;
-    border-top: lightgrey 2px solid;
-    border-right: grey 2px solid;
-    border-bottom: none;
-    cursor: pointer;
+    padding: 8px 16px;
+    width: auto;
+    border: none;
+    display: block;
+    outline: 0;
+    float: left;
   }
 
   button:disabled {
-    border-left-color: grey;
-    border-top-color: grey;
-    border-right-color: lightgrey;
-    color: lightblue;
+    color: #ffffff;
+    background-color: #616161;
   }
 
   button:not(:disabled):hover {
-    font-weight: bold;
-  }
-
-  button:not(:first-child) {
-    margin-left: 5px;
+    background-color: #cccccc;
+    cursor: pointer;
   }
 `
 
@@ -56,12 +67,12 @@ const Tabs = ({defaultTab, children}) => {
   }, [selected, children])
 
   return (
-    <div>
+    <Box>
       <ButtonTray>
         {buttons}
       </ButtonTray>
       {displayed}
-    </div>
+    </Box>
   )
 }
 
