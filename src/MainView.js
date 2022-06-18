@@ -43,6 +43,16 @@ const Filters = styled.div`
   width: 100%;
   padding-top: 5px;
   overflow-y: auto;
+
+  button {
+    border-radius: 2px;
+    background-color: #ffffff;
+    border: 1px solid #2196f3;
+  }
+
+  button:hover {
+    background-color: #f1f1f1;
+  }
 `
 
 // VisualGrid shows grid of data visualisations two per row
@@ -57,15 +67,49 @@ const Visual = styled.div`
   flex-grow: 1;
   width: calc(50% - 4px);
   margin: 2px;
+`
 
-  h1 {
-    background-color: gray;
-    color: white;
-    font-size: 10pt;
-    font-weight: bold;
-    padding: 2px;
-    margin: 0px;
+const TitleBar = styled.div`
+  color: #000000;
+  background-color: #f1f1f1;
+  border: 1px solid #cccccc;
+
+  &::before {
+    content: "";
+    display: table;
+    clear: both;
   }
+
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+`
+
+const TitleItemLeft = styled.div`
+  color: #000000;
+  font-size: 10pt;
+  font-weight: bold;
+  padding: 8px 16px;
+  float: left;
+  display: block;
+  outline: 0;
+`
+
+const TitleItemRight = styled.div`
+  color: #000000;
+  font-size: 10pt;
+  font-weight: bold;
+  padding: 8px 16px;
+  float: right;
+  display: block;
+  outline: 0;
+`
+
+const ItalicMessage = styled.p`
+  padding-left: 16px;
+  font-style: italic;
 `
 
 const MainView = () => {
@@ -73,7 +117,7 @@ const MainView = () => {
   const errorRef = useRef();        // reference to the error display module
 
   /* places to store state */
-  const [loading, setLoading] = useState(false);                           // should the loading box be open
+  const [loading, setLoading] = useState(false);                          // should the loading box be open
   const [sankeyShowBlackhole, setSankeyShowBlackhole] = useState(false);  // should we show the sankey blackhole nodes/links
   const [allData, setAllData] = useState([]);                             // this is all the raw data as loaded
   const [dataHash, setDataHash] = useState({});                           // this is the raw data organised as a hash with the key being the __sys_id (row ID)
@@ -292,7 +336,7 @@ const MainView = () => {
         <Tabs defaultTab="Statistics">
           <TabContent name="Statistics">
             <DetailTable
-              data={Object.entries(dataStats).map((s, i) => {
+              data={Object.entries(dataStats).filter(d => d[1].fieldName !== "__sys_id").map((s, i) => {
                 return {
                   "__sys_id": "attr_" + i,
                   "Field Name": s[1].fieldName,
@@ -312,7 +356,10 @@ const MainView = () => {
           <TabContent name="Visualisations">
             <VisualGrid>
               <Visual>
-                <h1>Filter Dyanmics</h1>
+                <TitleBar>
+                  <TitleItemLeft>Filter Dynamics</TitleItemLeft>
+                  <TitleItemRight>r</TitleItemRight>
+                </TitleBar>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 ? 
                 <InjectContainerSize>
                   <Sankey
@@ -322,7 +369,7 @@ const MainView = () => {
                     margin={10}
                     hideBlackhole={!sankeyShowBlackhole}
                   />
-                </InjectContainerSize> : <p>Need to select at least two filters</p>}
+                </InjectContainerSize> : <ItalicMessage>Need to select at least two filters</ItalicMessage>}
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 && 
                 <div>
                   <input
@@ -337,7 +384,9 @@ const MainView = () => {
                 </div>}
               </Visual>
               <Visual>
-                <h1>Data Waterfall</h1>
+                <TitleBar>
+                  <TitleItemLeft>Data Waterfall</TitleItemLeft>
+                </TitleBar>
                 <InjectContainerSize>
                   {filters.filter(f => f.options.length > 0).length > 0 ? <Waterfall
                     margin={20}
@@ -356,7 +405,7 @@ const MainView = () => {
                       }
                     })
                     ]}
-                  /> : <p>Need to select at least one filter</p>}
+                  /> : <ItalicMessage>Need to select at least one filter</ItalicMessage>}
                 </InjectContainerSize>
               </Visual>
             </VisualGrid>

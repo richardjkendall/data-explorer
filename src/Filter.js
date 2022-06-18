@@ -22,6 +22,13 @@ const Container = styled.div`
   
   button {
     font-size: 8pt;
+    border-radius: 2px;
+    background-color: #ffffff;
+    border: 1px solid #2196f3;
+  }
+
+  button:hover {
+    background-color: #f1f1f1;
   }
 
   table p {

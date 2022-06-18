@@ -2,11 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
+  padding: 2px;
+
   table {
     font-size: 8pt;
     width: 100%;
     max-width: 100%;
     table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  table tr {
+    border-bottom: 1px solid #cccccc;
   }
 
   tr:first-child>th {
@@ -15,10 +22,19 @@ const Container = styled.div`
     background-color: grey;
   }
 
-  table td {
+  table td, th {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    padding: 8px 8px;
+    text-align: left;
+    vertical-align: top;
+    display: table-cell;
+    border: 0;
+  }
+
+  table td:first-child, th:first-child {
+    padding-left: 16px;
   }
 
   table th {
@@ -30,11 +46,15 @@ const Container = styled.div`
   }
 
   tr:nth-child(odd) {
-    background-color: #efefef;
+    background-color: #ffffff;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f1f1f1;
   }
 
   table tr:hover td {
-    background-color: #ffffcc;
+    background-color: #cccccc;
   }
 `
 
