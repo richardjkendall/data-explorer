@@ -15,6 +15,7 @@ import InjectContainerSize from './InjectContainerSize';
 import MetaLabel from './MetaLabel';
 import ErrorDisplay from './ErrorDisplay';
 import Loading from './Loading';
+import FieldSelector from './FieldSelector';
 
 import copy from './images/copy.png';
 import expand from './images/expand.png';
@@ -132,6 +133,7 @@ const MainView = () => {
 
   /* places to store state */
   const [loading, setLoading] = useState(false);                          // should the loading box be open
+  const [showFieldSelector, setShowFieldSelector] = useState(false);      // show the field selector box be open
   const [sankeyShowBlackhole, setSankeyShowBlackhole] = useState(false);  // should we show the sankey blackhole nodes/links
   const [allData, setAllData] = useState([]);                             // this is all the raw data as loaded
   const [dataHash, setDataHash] = useState({});                           // this is the raw data organised as a hash with the key being the __sys_id (row ID)
@@ -318,6 +320,21 @@ const MainView = () => {
   return (
     <div>
       <ErrorDisplay ref={errorRef} displayLength={10} />
+      <FieldSelector 
+        show={showFieldSelector} 
+        close={() => setShowFieldSelector(false)}
+        fields={fieldNames.filter(f => f !== "__sys_id")}
+        filtered={filters.filter(f => f.options.length > 0).map(f => f.field)}
+        selected={fieldsToShow}
+        selectField={(id, selected) => {
+          if(selected) {
+            // need to add it
+            setFieldsToShow(fieldsToShow.concat([id]));
+          } else {
+            setFieldsToShow(fieldsToShow.filter(f => f !== id));
+          }
+        }}
+      />
       <Loading
         showLoading={loading}
       />
@@ -336,7 +353,7 @@ const MainView = () => {
             {filters.map((f, i) => <Filter 
               key={f.id}
               id={f.id}
-              fields={["", ...fieldNames]} 
+              fields={["", ...fieldNames.filter(f => f !== "__sys_id")]} 
               availableOptions={distinctVals} 
               selectedField={f.field} 
               selectedOptions={f.options} 
@@ -433,12 +450,13 @@ const MainView = () => {
             </VisualGrid>
           </TabContent>
           <TabContent name="Raw Data">
-            <button>Select fields</button>
+            <button onClick={() => {setShowFieldSelector(true)}}>Select fields</button>
             <DetailTable
               data={dispData}
               columns={
                 ["__sys_id"]
                 .concat(filters.filter(f => f.options.length > 0).map(f => f.field))
+                .concat(fieldsToShow)
               }
             />
           </TabContent>
