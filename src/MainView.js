@@ -16,6 +16,9 @@ import MetaLabel from './MetaLabel';
 import ErrorDisplay from './ErrorDisplay';
 import Loading from './Loading';
 
+import copy from './images/copy.png';
+import expand from './images/expand.png';
+
 // ControlPanel is the area at the top where the filters are placed
 // may be extended in the future hence being called ControlPanel
 const ControlPanel = styled.div`
@@ -112,6 +115,17 @@ const ItalicMessage = styled.p`
   font-style: italic;
 `
 
+const ImgButton = styled.img`
+  width: 14px;
+  height: 14px;
+  margin-left: 10px;
+
+  &:hover {
+    background-color: #efefef;
+    cursor: pointer;
+  }
+`
+
 const MainView = () => {
   /* refs */
   const errorRef = useRef();        // reference to the error display module
@@ -128,6 +142,7 @@ const MainView = () => {
   const [dispData, setDispData] = useState([]);                           // this is the data which matches the filters
   const [filterStats, setFilterStats] = useState([]);                     // these are the stats from the filtering process
   const [fileName, setFileName] = useState("");                           // name of the loaded file
+  const [fieldsToShow, setFieldsToShow] = useState([]);                   // list of fields to display
   const [sankeyData, setSankeyData] = useState({                          // data used to render the Sankey diagram
     nodes: [],
     links: []
@@ -358,7 +373,10 @@ const MainView = () => {
               <Visual>
                 <TitleBar>
                   <TitleItemLeft>Filter Dynamics</TitleItemLeft>
-                  <TitleItemRight>r</TitleItemRight>
+                  <TitleItemRight>
+                    <ImgButton src={expand} />
+                    <ImgButton src={copy} />
+                  </TitleItemRight>
                 </TitleBar>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 ? 
                 <InjectContainerSize>
@@ -386,6 +404,10 @@ const MainView = () => {
               <Visual>
                 <TitleBar>
                   <TitleItemLeft>Data Waterfall</TitleItemLeft>
+                  <TitleItemRight>
+                    <ImgButton src={expand} />
+                    <ImgButton src={copy} />
+                  </TitleItemRight>
                 </TitleBar>
                 <InjectContainerSize>
                   {filters.filter(f => f.options.length > 0).length > 0 ? <Waterfall
@@ -411,7 +433,7 @@ const MainView = () => {
             </VisualGrid>
           </TabContent>
           <TabContent name="Raw Data">
-            <p style={{padding: "0px", marginTop: "5px", marginBottom: "5px"}}>Showing {dispData.length} rows | Export to <a href="#" onClick={saveToCsv.bind(null, dispData)}>CSV</a></p>
+            <button>Select fields</button>
             <DetailTable
               data={dispData}
               columns={
