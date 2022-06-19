@@ -4,15 +4,15 @@
  * to get this working
  */
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, forwardRef } from "react";
 import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal, sankeyLeft } from "d3-sankey";
 import chroma from "chroma-js";
 
 import "./sankey.css";
 
-const Sankey = ({ data, width, height, margin, hideBlackhole }) => {
-  const ref = useRef();
+const Sankey = forwardRef(({ data, width, height, margin, hideBlackhole }, ref) => {
+  //const ref = useRef();
 
   useEffect(() => {
     // should draw when data changes
@@ -151,6 +151,6 @@ const Sankey = ({ data, width, height, margin, hideBlackhole }) => {
   return (
     <svg ref={ref} width={width + (margin*2)} height={height + (margin*2)} />
   );
-};
+});
 
 export default Sankey;

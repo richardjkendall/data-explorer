@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
 import jp from 'jsonpath';
+import * as htmlToImage from 'html-to-image';
 
 import Filter from './Filter';
 import { FilterDataSetWithIndex,  saveToCsv, GetStats } from './Utils';
@@ -127,9 +128,27 @@ const ImgButton = styled.img`
   }
 `
 
+const FieldDisplayToolbar = styled.div`
+  padding: 2px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+
+  p {
+    margin: 0px;
+    font-size: 10pt;
+    padding-right: 5px;
+  }
+
+  button {
+    margin-right: 5px;
+  }
+`
+
 const MainView = () => {
   /* refs */
   const errorRef = useRef();        // reference to the error display module
+  const sankeyRef = useRef();       // reference to the sankey chart
 
   /* places to store state */
   const [loading, setLoading] = useState(false);                          // should the loading box be open
@@ -317,6 +336,37 @@ const MainView = () => {
     reader.readAsDataURL(file);
   }
 
+  const domElementToClipboard = (element) => {
+    console.log("copying chart to clipboard", element);
+    htmlToImage.toBlob(element)
+    .then(blob => {
+      navigator.clipboard.write([
+        new window.ClipboardItem(
+          Object.defineProperty({}, blob.type, {
+            value: blob,
+            enumerable: true
+          })
+        )
+      ]).then(() => {
+        console.log("copied to clipboard");
+      });
+    });
+    /*html2canvas(element).then(canvas => {
+      canvas.toBlob(blob => {
+        navigator.clipboard.write([
+          new window.ClipboardItem(
+            Object.defineProperty({}, blob.type, {
+              value: blob,
+              enumerable: true
+            })
+          )
+        ]).then(() => {
+          console.log("copied to clipboard");
+        })
+      });
+    });*/
+  }
+
   return (
     <div>
       <ErrorDisplay ref={errorRef} displayLength={10} />
@@ -392,7 +442,9 @@ const MainView = () => {
                   <TitleItemLeft>Filter Dynamics</TitleItemLeft>
                   <TitleItemRight>
                     <ImgButton src={expand} />
-                    <ImgButton src={copy} />
+                    <ImgButton src={copy} onClick={() => {
+                      domElementToClipboard(sankeyRef.current);
+                    }} />
                   </TitleItemRight>
                 </TitleBar>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 ? 
@@ -403,6 +455,7 @@ const MainView = () => {
                     height={500}
                     margin={10}
                     hideBlackhole={!sankeyShowBlackhole}
+                    ref={sankeyRef}
                   />
                 </InjectContainerSize> : <ItalicMessage>Need to select at least two filters</ItalicMessage>}
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 && 
@@ -450,7 +503,11 @@ const MainView = () => {
             </VisualGrid>
           </TabContent>
           <TabContent name="Raw Data">
-            <button onClick={() => {setShowFieldSelector(true)}}>Select fields</button>
+            <FieldDisplayToolbar>
+              <p>{`Showing ${dispData.length} records`}</p>
+              <button onClick={() => {setShowFieldSelector(true)}}>Select fields</button>
+              <button onClick={() => {saveToCsv(dispData)}}>Save to CSV</button>
+            </FieldDisplayToolbar>
             <DetailTable
               data={dispData}
               columns={
