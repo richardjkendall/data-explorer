@@ -1,6 +1,6 @@
 .App {
   padding: 10px 0px 0px 10px;
-  width: calc(100vw - 20px);
+  width: calc(100% - 15px);
 }
 
 .App h1 {

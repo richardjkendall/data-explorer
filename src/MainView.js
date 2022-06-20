@@ -20,6 +20,7 @@ import FieldSelector from './FieldSelector';
 
 import copy from './images/copy.png';
 import expand from './images/expand.png';
+import FullscreenChart from './FullscreenChart';
 
 // ControlPanel is the area at the top where the filters are placed
 // may be extended in the future hence being called ControlPanel
@@ -70,8 +71,13 @@ const VisualGrid = styled.div`
 // these are the Visuals which go in the visual grid
 const Visual = styled.div`
   flex-grow: 1;
-  width: calc(50% - 4px);
-  margin: 2px;
+  width: calc(50% - 10px);
+  height: 600px;
+  margin: 5px;
+
+  &:not(:first-child) {
+    margin-left: 0px;
+  }
 `
 
 const TitleBar = styled.div`
@@ -129,7 +135,8 @@ const ImgButton = styled.img`
 `
 
 const FieldDisplayToolbar = styled.div`
-  padding: 2px;
+  padding: 5px;
+  padding-bottom: 0px;
   display: flex;
   justify-content: left;
   align-items: center;
@@ -142,6 +149,13 @@ const FieldDisplayToolbar = styled.div`
 
   button {
     margin-right: 5px;
+    border-radius: 2px;
+    background-color: #ffffff;
+    border: 1px solid #2196f3;
+  }
+
+  button:hover {
+    background-color: #f1f1f1;
   }
 `
 
@@ -149,10 +163,12 @@ const MainView = () => {
   /* refs */
   const errorRef = useRef();        // reference to the error display module
   const sankeyRef = useRef();       // reference to the sankey chart
+  const largeSankeyRef = useRef();  // reference to the large sankey chart
 
   /* places to store state */
   const [loading, setLoading] = useState(false);                          // should the loading box be open
   const [showFieldSelector, setShowFieldSelector] = useState(false);      // show the field selector box be open
+  const [showLargeSankey, setShowLargeSankey] = useState(false);          // show the large sankey diagram
   const [sankeyShowBlackhole, setSankeyShowBlackhole] = useState(false);  // should we show the sankey blackhole nodes/links
   const [allData, setAllData] = useState([]);                             // this is all the raw data as loaded
   const [dataHash, setDataHash] = useState({});                           // this is the raw data organised as a hash with the key being the __sys_id (row ID)
@@ -351,20 +367,6 @@ const MainView = () => {
         console.log("copied to clipboard");
       });
     });
-    /*html2canvas(element).then(canvas => {
-      canvas.toBlob(blob => {
-        navigator.clipboard.write([
-          new window.ClipboardItem(
-            Object.defineProperty({}, blob.type, {
-              value: blob,
-              enumerable: true
-            })
-          )
-        ]).then(() => {
-          console.log("copied to clipboard");
-        })
-      });
-    });*/
   }
 
   return (
@@ -441,14 +443,14 @@ const MainView = () => {
                 <TitleBar>
                   <TitleItemLeft>Filter Dynamics</TitleItemLeft>
                   <TitleItemRight>
-                    <ImgButton src={expand} />
+                    <ImgButton src={expand} onClick={() => setShowLargeSankey(true)}/>
                     <ImgButton src={copy} onClick={() => {
                       domElementToClipboard(sankeyRef.current);
                     }} />
                   </TitleItemRight>
                 </TitleBar>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 ? 
-                <InjectContainerSize>
+                <InjectContainerSize heightBuffer={60}>
                   <Sankey
                     data={sankeyData}
                     width={500}
@@ -457,7 +459,20 @@ const MainView = () => {
                     hideBlackhole={!sankeyShowBlackhole}
                     ref={sankeyRef}
                   />
-                </InjectContainerSize> : <ItalicMessage>Need to select at least two filters</ItalicMessage>}
+                </InjectContainerSize> : <ItalicMessage>You need to select at least two filters</ItalicMessage>}
+                <FullscreenChart 
+                  show={showLargeSankey}
+                  close={() => setShowLargeSankey(false)}
+                >
+                  <Sankey
+                    data={sankeyData}
+                    width={500}
+                    height={500}
+                    margin={10}
+                    hideBlackhole={!sankeyShowBlackhole}
+                    ref={largeSankeyRef}
+                  />
+                </FullscreenChart>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 && 
                 <div>
                   <input
@@ -479,7 +494,7 @@ const MainView = () => {
                     <ImgButton src={copy} />
                   </TitleItemRight>
                 </TitleBar>
-                <InjectContainerSize>
+                <InjectContainerSize heightBuffer={70}>
                   {filters.filter(f => f.options.length > 0).length > 0 ? <Waterfall
                     margin={20}
                     width={500}
@@ -497,7 +512,7 @@ const MainView = () => {
                       }
                     })
                     ]}
-                  /> : <ItalicMessage>Need to select at least one filter</ItalicMessage>}
+                  /> : <ItalicMessage>You need to select at least one filter</ItalicMessage>}
                 </InjectContainerSize>
               </Visual>
             </VisualGrid>

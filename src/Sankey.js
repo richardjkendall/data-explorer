@@ -67,7 +67,7 @@ const Sankey = forwardRef(({ data, width, height, margin, hideBlackhole }, ref) 
       .nodeWidth(15)
       .nodePadding(10)
       .nodeAlign(sankeyLeft)
-      .extent([[1, 1], [width - (margin * 2), height - 5]])(data);
+      .extent([[1, 1], [width - (margin * 2), height - (margin*2)]])(data);
     
     console.log("sankey nodes", nodes);
 
@@ -149,7 +149,7 @@ const Sankey = forwardRef(({ data, width, height, margin, hideBlackhole }, ref) 
   }
 
   return (
-    <svg ref={ref} width={width + (margin*2)} height={height + (margin*2)} />
+    <svg ref={ref} width={width + (margin*2)} height={height} />
   );
 });
 
