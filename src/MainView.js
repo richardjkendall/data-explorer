@@ -161,14 +161,17 @@ const FieldDisplayToolbar = styled.div`
 
 const MainView = () => {
   /* refs */
-  const errorRef = useRef();        // reference to the error display module
-  const sankeyRef = useRef();       // reference to the sankey chart
-  const largeSankeyRef = useRef();  // reference to the large sankey chart
+  const errorRef = useRef();           // reference to the error display module
+  const sankeyRef = useRef();          // reference to the sankey chart
+  const waterfallRef = useRef();       // reference to the waterfall chart
+  const largeSankeyRef = useRef();     // reference to the large sankey chart
+  const largeWaterfallRef = useRef();  // reference to the large waterfall chart
 
   /* places to store state */
   const [loading, setLoading] = useState(false);                          // should the loading box be open
   const [showFieldSelector, setShowFieldSelector] = useState(false);      // show the field selector box be open
   const [showLargeSankey, setShowLargeSankey] = useState(false);          // show the large sankey diagram
+  const [showLargeWaterfall, setShowLargeWaterfall] = useState(false);    // show the large waterfall diagram
   const [sankeyShowBlackhole, setSankeyShowBlackhole] = useState(false);  // should we show the sankey blackhole nodes/links
   const [allData, setAllData] = useState([]);                             // this is all the raw data as loaded
   const [dataHash, setDataHash] = useState({});                           // this is the raw data organised as a hash with the key being the __sys_id (row ID)
@@ -490,16 +493,20 @@ const MainView = () => {
                 <TitleBar>
                   <TitleItemLeft>Data Waterfall</TitleItemLeft>
                   <TitleItemRight>
-                    <ImgButton src={expand} />
-                    <ImgButton src={copy} />
+                    <ImgButton src={expand} onClick={() => setShowLargeWaterfall(true)}/>
+                    <ImgButton src={copy} onClick={() => {
+                      domElementToClipboard(waterfallRef.current);
+                    }} />
                   </TitleItemRight>
                 </TitleBar>
                 <InjectContainerSize heightBuffer={70}>
-                  {filters.filter(f => f.options.length > 0).length > 0 ? <Waterfall
+                  {filters.filter(f => f.options.length > 0).length > 0 ? 
+                  <Waterfall
                     margin={20}
                     width={500}
                     height={500}
                     endName="Final Set"
+                    ref={waterfallRef}
                     data={[{
                       group: "Initial Set",
                       start: allData.length
@@ -514,6 +521,31 @@ const MainView = () => {
                     ]}
                   /> : <ItalicMessage>You need to select at least one filter</ItalicMessage>}
                 </InjectContainerSize>
+                <FullscreenChart 
+                  show={showLargeWaterfall}
+                  close={() => setShowLargeWaterfall(false)}
+                  heightBuffer={60}
+                >
+                  <Waterfall
+                    margin={20}
+                    width={500}
+                    height={500}
+                    endName="Final Set"
+                    ref={largeWaterfallRef}
+                    data={[{
+                      group: "Initial Set",
+                      start: allData.length
+                    },
+                    ...filterStats.map(s => {
+                      return {
+                        // TODO fix bug below for deleted filters, need to guard against failed access to this field
+                        group: filters.filter(f => f.id === s.forId)[0]?.field,
+                        minus: s.eliminated
+                      }
+                    })
+                    ]}
+                  />
+                </FullscreenChart>
               </Visual>
             </VisualGrid>
           </TabContent>

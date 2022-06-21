@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import * as d3 from "d3";
 
 import "./waterfall.css";
 
-const Waterfall = ({ margin, width, height, data, endName }) => {
+const Waterfall = forwardRef(({ margin, width, height, data, endName }, ref) => {
   const subgroups = ["start", "float", "minus", "plus", endName];
 
-  const ref = useRef();
   const [procData, setProcData] = useState({
     groups: [],
     rows: []
@@ -148,6 +147,6 @@ const Waterfall = ({ margin, width, height, data, endName }) => {
   return (
     <svg ref={ref} width={(margin*2) - 10 + width} height={(margin*2) + height} />
   )
-};
+});
  
 export default Waterfall;

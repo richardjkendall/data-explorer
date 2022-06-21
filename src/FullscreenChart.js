@@ -13,7 +13,7 @@ const Container = styled.div`
   }
 `
 
-const FullscreenChart = ({show, close, children}) => {
+const FullscreenChart = ({show, close, children, heightBuffer = 0}) => {
   return (
     <Modal
       show={show}
@@ -21,7 +21,7 @@ const FullscreenChart = ({show, close, children}) => {
       close={close}
     >
       <Container>
-        <InjectContainerSize>
+        <InjectContainerSize heightBuffer={heightBuffer}>
           {children}
         </InjectContainerSize>
       </Container>

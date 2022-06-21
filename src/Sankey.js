@@ -4,7 +4,7 @@
  * to get this working
  */
 
-import React, { useEffect, useRef, forwardRef } from "react";
+import React, { useEffect, forwardRef } from "react";
 import * as d3 from "d3";
 import { sankey, sankeyLinkHorizontal, sankeyLeft } from "d3-sankey";
 import chroma from "chroma-js";
@@ -12,13 +12,12 @@ import chroma from "chroma-js";
 import "./sankey.css";
 
 const Sankey = forwardRef(({ data, width, height, margin, hideBlackhole }, ref) => {
-  //const ref = useRef();
 
   useEffect(() => {
     // should draw when data changes
     draw();
   // eslint-disable-next-line
-  }, [data, width, hideBlackhole]);
+  }, [data, width, height, hideBlackhole]);
 
   const nodeMouseOver = (event, node) => {
     //console.log("mouse over node", node, "event", event);

@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-const Container = styled.div`
+const Container = styled.div.attrs(props => ({
+  style: {
+    height: `calc(100% - ${props.buffer}px)`
+  }
+}))`
   width: 100%;
-  height: calc(100% - ${props => props.buffer}px);
 `
 
 const InjectContainerSize = ({children, heightBuffer = 0}) => {
@@ -17,7 +20,7 @@ const InjectContainerSize = ({children, heightBuffer = 0}) => {
     const displayObserver = new ResizeObserver(entries => {
       try {
         const containerRect = ref.current.getBoundingClientRect();
-        console.log("container size", containerRect);
+        //console.log("container size", containerRect);
         setRect({
           width: containerRect.width,
           height: containerRect.height
