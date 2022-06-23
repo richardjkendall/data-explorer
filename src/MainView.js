@@ -72,7 +72,7 @@ const VisualGrid = styled.div`
 const Visual = styled.div`
   flex-grow: 1;
   width: calc(50% - 10px);
-  height: 600px;
+  height: 620px;
   margin: 5px;
 
   &:not(:first-child) {
@@ -344,6 +344,7 @@ const MainView = () => {
             break;
           default:
             errorRef.current.addError(`File type of ${fileType} is not supported.`);
+            setLoading(false);
             return;
         }
       } else {
@@ -401,7 +402,7 @@ const MainView = () => {
       </div>}
       {allData.length > 0 &&
       <div>
-        {fileName !== "" && <MetaLabel title={fileName} />}
+        {fileName !== "" && <MetaLabel fileName={fileName} size={allData.length} />}
         <ControlPanel>
           <ControlTitle>Filters</ControlTitle>
           <Filters>
@@ -453,7 +454,7 @@ const MainView = () => {
                   </TitleItemRight>
                 </TitleBar>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 ? 
-                <InjectContainerSize heightBuffer={60}>
+                <InjectContainerSize heightBuffer={70}>
                   <Sankey
                     data={sankeyData}
                     width={500}
@@ -477,7 +478,9 @@ const MainView = () => {
                   />
                 </FullscreenChart>
                 {sankeyData.nodes.length > 0 && sankeyData.links.length > 0 && 
-                <div>
+                <div style={{
+                  margin: "8px"
+                }}>
                   <input
                     id="sankeyShowBlackhole"
                     type="checkbox"
@@ -499,7 +502,7 @@ const MainView = () => {
                     }} />
                   </TitleItemRight>
                 </TitleBar>
-                <InjectContainerSize heightBuffer={70}>
+                <InjectContainerSize heightBuffer={90}>
                   {filters.filter(f => f.options.length > 0).length > 0 ? 
                   <Waterfall
                     margin={20}
