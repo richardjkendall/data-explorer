@@ -53,6 +53,10 @@ const Sankey = forwardRef(({ data, width, height, margin, hideBlackhole }, ref) 
     svg.select(`#link_${link.index}`).style("stroke-opacity", 0.3);
   }
 
+  const linkClick = (event, link) => {
+    console.log("link was clicked", link);
+  }
+
   const draw = () => {
 
     const svg = d3.select(ref.current);
@@ -101,6 +105,7 @@ const Sankey = forwardRef(({ data, width, height, margin, hideBlackhole }, ref) 
         .style("stroke-width", (d) => d.width)
         .on("mouseover", linkMouseOver)
         .on("mouseout", linkMouseOut)
+        .on("click", linkClick)
     
     // add the nodes
     let node = selection.append("g")

@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Data Explorer",
+  "name": "Data Explorer Application",
   "icons": [
     {
       "src": "favicon.ico",
