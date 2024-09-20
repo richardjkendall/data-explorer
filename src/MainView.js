@@ -186,7 +186,10 @@ const MainView = () => {
   const [sankeyData, setSankeyData] = useState({                          // data used to render the Sankey diagram
     nodes: [],
     links: []
-  });        
+  });
+  const [aggField, setAggField] = useState("row-count");                  // what field should we use for visualisation values
+  const [aggMode, setAggMode] = useState("row-count");                        // how should we aggregate the data for a visualistion              
+  const [filterHighlight, setFilterHighlight] = useState(-1);             // this is the array position of a highlighted filter, which is used during the drag operation (to move filters around)
 
   // need to process data once loaded
   useEffect(() => {
@@ -212,8 +215,7 @@ const MainView = () => {
 
   // need to filter data and display if the filters have changed
   useEffect(() => {
-    const [subset, stats] = FilterDataSetWithIndex(dataHash, dataStats, filters);
-    //console.log("filter stats", stats);
+    const [subset, stats] = FilterDataSetWithIndex(dataHash, dataStats, filters, aggMode, aggField);
     setDispData(subset);
     setFilterStats(stats);
     let sankey = {
@@ -229,13 +231,11 @@ const MainView = () => {
           sankey.nodes.push(f.field + "~blackhole");
         }
       })
-      //console.log("sankey nodes", sankey.nodes);
       stats.slice(1).forEach((s, i) => {
         Object.keys(s.fromToMap).forEach(fk => {
           const from = filters[i].field + "~" + fk;
           Object.keys(s.fromToMap[fk]).forEach(tk => {
             const to = filters[i+1].field + "~" + tk;
-            //console.log("link: from", sankey.nodes.indexOf(from), "to", sankey.nodes.indexOf(to), "value", s.fromToMap[fk][tk]);
             sankey.links.push({
               source: sankey.nodes.indexOf(from),
               target: sankey.nodes.indexOf(to),
@@ -253,8 +253,10 @@ const MainView = () => {
         category: n.split("~")[0]
       }
     });
+    console.log("sankey edges", sankey.links);
+
     setSankeyData(sankey);
-  }, [filters, dataHash, dataStats])
+  }, [filters, dataHash, dataStats, aggField, aggMode])
 
   const addFilter = () => {
     setFilters([
@@ -286,11 +288,38 @@ const MainView = () => {
   }
 
   const changeOption = (id, option, added) => {
+    //console.log("change option", id, option, added);
     setFilters(filters.map(f => {
       if(f.id === id) {
         return {
           ...f,
           options: added ? f.options.concat([option]) : f.options.filter(o => o !== option)
+        }
+      } else {
+        return f;
+      }
+    }));
+  }
+
+  const selectAllOptions = (id, options) => {
+    setFilters(filters.map(f => {
+      if(f.id === id) {
+        return {
+          ...f,
+          options: options
+        }
+      } else {
+        return f;
+      }
+    }));
+  }
+  
+  const clearAllOptions = (id) => {
+    setFilters(filters.map(f => {
+      if(f.id === id) {
+        return {
+          ...f,
+          options: []
         }
       } else {
         return f;
@@ -373,6 +402,20 @@ const MainView = () => {
     });
   }
 
+  const swapFilters = (from, to) => {
+    setFilters(
+      filters.map((f, i) => {
+        if(i === to) {
+          return filters[from];
+        }
+        if(i === from) {
+          return filters[to];
+        }
+        return f
+      })
+    )
+  }
+
   return (
     <div>
       <ErrorDisplay ref={errorRef} displayLength={10} />
@@ -405,18 +448,25 @@ const MainView = () => {
         {fileName !== "" && <MetaLabel fileName={fileName} size={allData.length} />}
         <ControlPanel>
           <ControlTitle>Filters</ControlTitle>
-          <Filters>
+          <Filters onDragOver={e => {e.preventDefault()}}>
             {filters.map((f, i) => <Filter 
               key={f.id}
               id={f.id}
+              pos={i}
+              count={filters.length}
               fields={["", ...fieldNames.filter(f => f !== "__sys_id")]} 
               availableOptions={distinctVals} 
               selectedField={f.field} 
               selectedOptions={f.options} 
               changeField={selectField}
               changeSelection={changeOption}
+              selectAll={selectAllOptions}
+              clearAll={clearAllOptions}
               deleteFilter={deleteFilter}
               stats={filterStats}
+              highlight={filterHighlight === i}
+              setHighlight={id => {setFilterHighlight(id)}}
+              moveFilter={swapFilters}
             />)}
             <button disabled={filters.length > 0 && filters.slice(-1).pop().options.length === 0} onClick={addFilter}>+</button>
           </Filters>
@@ -442,6 +492,24 @@ const MainView = () => {
             />
           </TabContent>
           <TabContent name="Visualisations">
+            <FieldDisplayToolbar>
+              <p>Aggregation mode:</p>
+              <select value={aggMode} onChange={e => setAggMode(e.target.value)}>
+                <option value="row-count">Count</option>
+                <option value="sum">Sum</option>
+                <option value="mean">Mean</option>
+              </select>
+              {aggMode !== "row-count" && <>
+                <p>Field:</p>
+                <select value={aggField} onChange={e => setAggField(e.target.value)}>
+                  {
+                    Object.entries(dataStats).filter(d => d[1].fieldName !== "__sys_id" && d[1].fieldType === "number").map(f => 
+                      <option key={`field_${f[1].fieldName}`} value={f[1].fieldName}>{f[1].fieldName}</option>
+                    )
+                  }
+                </select>
+              </>}
+            </FieldDisplayToolbar>
             <VisualGrid>
               <Visual>
                 <TitleBar>

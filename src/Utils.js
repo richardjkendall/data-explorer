@@ -115,7 +115,7 @@ const difference = (a, b) => {
   return Array.from(diff);
 } 
 
-export const FilterDataSetWithIndex = (data, stats, filters) => {
+export const FilterDataSetWithIndex = (data, stats, filters, aggMode = "row-count", aggField = "") => {
   // get size of data
   const totalRows = Object.keys(data).length;
   // place to store the filter stats
@@ -160,7 +160,27 @@ export const FilterDataSetWithIndex = (data, stats, filters) => {
       // create from/to map
       filterStats[i].fromToMap = Object.keys(filterStats[i-1].selectedIdMap).reduce((p, from) => {
         p[from] = Object.keys(filterStats[i].selectedIdMap).reduce((p, to) => {
-          p[to] = intersect(filterStats[i-1].selectedIdMap[from], filterStats[i].selectedIdMap[to]).length;
+          // if aggMode is row-count then we take length of intersected array
+          if(aggMode === "row-count") {
+            p[to] = intersect(filterStats[i-1].selectedIdMap[from], filterStats[i].selectedIdMap[to]).length;
+          }
+          // if agg mode is sum of a numeric field, then we should get the associated rows and then do a reduce
+          if(aggMode === "sum") {
+            p[to] = intersect(filterStats[i-1].selectedIdMap[from], filterStats[i].selectedIdMap[to])
+                    .map(id => data[id])
+                    .reduce((p, c) => p + Number(c[aggField]), 0);
+          }
+          if(aggMode === "mean") {
+            const fData = intersect(filterStats[i-1].selectedIdMap[from], filterStats[i].selectedIdMap[to])
+                          .map(id => data[id]);
+
+            if(fData.length > 0) {
+              p[to] = fData.reduce((p, c) => p + Number(c[aggField]), 0) / fData.length;
+            } else {
+              p[to] = 0;
+            }
+          }
+          
           return p;
         }, {});
         // we need to add the to blackhole at the end...
